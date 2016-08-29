@@ -4,3 +4,8 @@
 - Node, npm
 - express
 - socket.io
+
+## Run Locally
+- npm install
+- node .
+- Browse to http://localhost:3000
