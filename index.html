@@ -1,0 +1,83 @@
+<html>
+    <body>
+        <input id="username-textbox" />
+        <button id="username-login">Login</button>
+        <button id="username-logout" disabled>Logout</button>
+        
+        <br/>
+        
+        <input id="message-to-send"/>
+        <button id="send-message" type="button" disabled>Send Message</button>
+        
+        <div id="messages"></div>
+
+        <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+        <script src="./socket.io.js"></script>
+
+        <script>
+            var socket = io();
+            var loggedin = false;
+
+            $("#username-login").click(function() {
+                loggedin = true;
+
+                $("#username-textbox").prop("disabled", true);
+                $("#username-login").prop("disabled", true);
+                $("#username-logout").prop("disabled", false);
+
+                $("#send-message").prop("disabled", false);
+
+                var name = $("#username-textbox").val();
+                socket.emit('logging-in', name);
+            });
+
+            $("#username-logout").click(function() {
+                loggedin = false;
+
+                $("#username-textbox").prop("disabled", false);
+                $("#username-login").prop("disabled", false);
+                $("#username-logout").prop("disabled", true);
+
+                $("#send-message").prop("disabled", true);
+
+                var name = $("#username-textbox").val();
+                socket.emit('logging-out', name);
+            });
+
+            $("#send-message").click(function(element) {
+                if(loggedin) {
+                    var message = $("#message-to-send").val();
+                    console.log('%s sent message %s', name, message);
+                    socket.emit('send-message', message);
+                    $("#message-to-send").val("");
+                    $("#message-to-send").focus();
+                }
+            });
+
+            socket.on('message-from-server', function (data) {
+                if(loggedin) {
+                    console.log("message-from-server " + data.message);
+                    $("#messages").append("<br/>");
+                    $("#messages").append("<b>" + data.sender + "</b>: " + data.message);
+                }
+            });
+
+            socket.on("logged-in", function(data) {
+                if(loggedin) {
+                    console.log("logged in " + data.message);
+                    $("#messages").append("<br/>");
+                    $("#messages").append("<b>" + data.message + "</b>");
+                }
+            });
+
+            socket.on("logged-out", function(data) {
+                if(loggedin) {
+                    console.log("logged out " + data.message);
+                    $("#messages").append("<br/>");
+                    $("#messages").append("<b>" + data.message + "</b>");
+                }
+            });
+
+        </script>
+    </body>
+</html>
