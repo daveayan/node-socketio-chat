@@ -1,3 +1,6 @@
+var bunyan = require('bunyan');
+var log = bunyan.createLogger({name: "node-socketio-chat"});
+
 var express = require('express');
 var app = express();
 
@@ -5,14 +8,19 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
 var port = 3000;
+if(process.argv[2] === undefined) {
+    // do nothing
+} else {
+    port = process.argv[2];
+}
 
 app.use(express.static(__dirname));
 
 io.on('connection', function (socket) {
-    console.log("new connection received");
+    log.info("new connection received");
 
     socket.on('logging-in', function (username) {
-        console.log("logging-in %s", username);
+        log.info("logging-in %s", username);
         socket.username = username;
 
         socket.broadcast.emit('logged-in', {
@@ -27,7 +35,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('logging-out', function (username) {
-        console.log("logging-out %s", username);
+        log.info("logging-out %s", username);
         socket.username = username;
 
         socket.broadcast.emit('logged-out', {
@@ -42,7 +50,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('send-message', function (chatMessage) {
-        console.log("%s clicked-button %s", socket.username, chatMessage);
+        log.info("%s clicked-button %s", socket.username, chatMessage);
         socket.broadcast.emit('message-from-server', {
             username: socket.username,
             sender: socket.username,
@@ -57,10 +65,10 @@ io.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function () {
-        console.log("disconnect received");
+        log.info("disconnect received");
     });
 });
 
 server.listen(port, function () {
-  console.log('Server listening at port %d', port);
+  log.info('Server listening at port %d', port);
 });

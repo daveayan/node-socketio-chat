@@ -4,8 +4,13 @@
 - Node, npm
 - express
 - socket.io
+- bunyan for logging
 
 ## Run Locally
 - npm install
-- node .
+- node . 
+  - optionally node . | bunyan
 - Browse to http://localhost:3000
+
+## WS Protocol Upgrade
+![WS Protocol](./ws-protocols.png)
